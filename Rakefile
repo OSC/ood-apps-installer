@@ -1,5 +1,3 @@
-require 'open3'
-
 SRC_DIR="src"
 DEPLOY_PATH="/var/www/ood/apps/sys"
 
@@ -19,25 +17,25 @@ def git_fetch(path)
   system("scl enable git19 -- git fetch", :chdir => path)
 end
 
-def git_checkout(version, path=nil)
+def git_checkout(version, path)
   system("scl enable git19 -- git checkout tags/#{version}", :chdir => path)
 end
 
-def build_node(path=nil)
+def build_node(path)
   system("scl enable git19 nodejs010 -- npm install", :chdir => path)
 end
 
-def rebuild_node(path=nil)
+def rebuild_node(path)
   build_node(path)
 end
 
-def build_rails(path=nil)
+def build_rails(path)
   system("scl enable rh-ruby22 -- bin/bundle install --path vendor/bundle", :chdir => path)
   system("scl enable rh-ruby22 nodejs010 -- bin/rake assets:precompile RAILS_ENV=production", :chdir => path)
   system("scl enable rh-ruby22 -- bin/rake tmp:clear", :chdir => path)
 end
 
-def rebuild_rails(path=nil)
+def rebuild_rails(path)
   system("scl enable rh-ruby22 -- bin/rake tmp:clear", :chdir => path)
   build_rails path
   system("touch tmp/restart.txt", :chdir => path)
@@ -76,8 +74,9 @@ task :install => :deploy
 
 task :update => :update_apps_parallel
 
+desc "Copies the application to the deployment path"
 task :deploy do
-  puts "Making a directory at #{DEPLOY_PATH}"
+  puts "Making a directory at #{DEPLOY_PATH} if it doesn't exist."
   FileUtils.mkdir_p(DEPLOY_PATH)
   puts "Copying applications from #{File.join(Dir.pwd, SRC_DIR)} to #{DEPLOY_PATH}"
   FileUtils.cp_r(SRC_DIR, DEPLOY_PATH)
@@ -95,6 +94,10 @@ OOD_APPS.each do |name, data|
   end
 end
 
+multitask :build_apps_parallel => @app_build_tasks
+
+task :build_apps_serial => @app_build_tasks
+
 # Build a task to update each app
 OOD_APPS.each do |name, data|
   desc %(Update and rebuild #{name})
@@ -105,10 +108,6 @@ OOD_APPS.each do |name, data|
     eval "rebuild_#{data[:type]}('#{app_path}')"
   end
 end
-
-multitask :build_apps_parallel => @app_build_tasks
-
-task :build_apps_serial => @app_build_tasks
 
 multitask :update_apps_parallel => @app_update_tasks
 
