@@ -68,10 +68,13 @@ end
 @app_build_tasks = get_install_list
 @app_update_tasks = get_update_list
 
+desc "Build all available applications in parallel"
 task :default => :build_apps_parallel
 
+desc "Copies all application assets to the deployment path"
 task :install => :deploy
 
+desc "Update all available applications in parallel"
 task :update => :update_apps_parallel
 
 desc "Copies the application to the deployment path"
@@ -86,16 +89,22 @@ end
 OOD_APPS.each do |name, data|
   desc %(Clone and build #{name})
   task install_task_name(name) do
+    puts "Making a directory at #{SRC_DIR}"
     FileUtils.mkdir_p(SRC_DIR)
     app_path = File.join(SRC_DIR, name)
+    puts "Cloning repository #{data[:repo]}"
     git_clone(data[:repo], app_path)
+    puts "Checking out version #{data[:repo]}/#{data[:version]}"
     git_checkout(data[:version], app_path)
+    puts "Building assets for #{name}"
     eval "build_#{data[:type]}('#{app_path}')"
   end
 end
 
+desc "Build all available apps in parallel"
 multitask :build_apps_parallel => @app_build_tasks
 
+desc "Build all available apps in serial"
 task :build_apps_serial => @app_build_tasks
 
 # Build a task to update each app
@@ -103,12 +112,17 @@ OOD_APPS.each do |name, data|
   desc %(Update and rebuild #{name})
   task update_task_name(name) do
     app_path = File.join(SRC_DIR, name)
+    puts "Fetching #{data[:repo]}"
     git_fetch(app_path)
+    puts "Checking out version #{data[:repo]}/#{data[:version]}"
     git_checkout(data[:version], app_path)
+    puts "Rebuilding assets for #{name}"
     eval "rebuild_#{data[:type]}('#{app_path}')"
   end
 end
 
+desc "Update all available apps in parallel"
 multitask :update_apps_parallel => @app_update_tasks
 
+desc "Update all available apps in serial"
 task :update_apps_serial => @app_update_tasks
