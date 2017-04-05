@@ -82,7 +82,7 @@ task :deploy do
   puts "Making a directory at #{DEPLOY_PATH} if it doesn't exist."
   FileUtils.mkdir_p(DEPLOY_PATH)
   puts "Copying applications from #{File.join(Dir.pwd, SRC_DIR)} to #{DEPLOY_PATH}"
-  FileUtils.cp_r(SRC_DIR, DEPLOY_PATH)
+  FileUtils.cp_r("#{SRC_DIR}/.", DEPLOY_PATH, remove_destination: true)
 end
 
 # Build a task to install each app
