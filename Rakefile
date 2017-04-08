@@ -1,128 +1,203 @@
-SRC_DIR="src"
-DEPLOY_PATH="/var/www/ood/apps/sys"
+require "ostruct"
+require "pathname"
 
-OOD_APPS={}
-OOD_APPS["dashboard"]   = { version: "v1.10.0", repo: "https://github.com/OSC/ood-dashboard.git",    type: "rails" }
-OOD_APPS["shell"]       = { version: "v1.1.2",  repo: "https://github.com/OSC/ood-shell.git",        type: "node" }
-OOD_APPS["files"]       = { version: "v1.3.1",  repo: "https://github.com/OSC/ood-fileexplorer.git", type: "node" }
-OOD_APPS["file-editor"] = { version: "v1.2.3",  repo: "https://github.com/OSC/ood-fileeditor.git",   type: "rails" }
-OOD_APPS["activejobs"]  = { version: "v1.3.1",  repo: "https://github.com/OSC/ood-activejobs.git",   type: "rails" }
-OOD_APPS["myjobs"]      = { version: "v2.1.2",  repo: "https://github.com/OSC/ood-myjobs.git",       type: "rails" }
+# Blessed apps
+OOD_APPS = {
+  dashboard: {
+    name: "dashboard",
+    type: "ruby",
+    rails: true,
+    repo: "https://github.com/OSC/ood-dashboard.git",
+    tag: "v1.10.0"
+  },
+  shell: {
+    name: "shell",
+    type: "nodejs",
+    repo: "https://github.com/OSC/ood-shell.git",
+    tag: "v1.1.2"
+  },
+  files: {
+    name: "files",
+    type: "nodejs",
+    repo: "https://github.com/OSC/ood-fileexplorer.git",
+    tag: "v1.3.1"
+  },
+  file_editor: {
+    name: "file-editor",
+    type: "ruby",
+    rails: true,
+    repo: "https://github.com/OSC/ood-fileeditor.git",
+    tag: "v1.2.3"
+  },
+  active_jobs: {
+    name: "activejobs",
+    type: "ruby",
+    rails: true,
+    repo: "https://github.com/OSC/ood-activejobs.git",
+    tag: "v1.3.1"
+  },
+  my_jobs: {
+    name: "myjobs",
+    type: "ruby",
+    rails: true,
+    repo: "https://github.com/OSC/ood-myjobs.git",
+    tag: "v2.1.2"
+  }
+}
 
-def git_clone(repository, folder)
-  system("scl enable git19 -- git clone #{repository} #{folder}")
+# System apps base-URI path
+# Example: access dashboard
+#   https://ondemand.domain.com/pun/sys/dashboard
+BASE_URI = ENV["BASE_URI"] || "/pun/sys"
+
+# Build options
+PREFIX ||= Pathname.new(ENV["PREFIX"] || "/var/www/ood/apps/sys")
+OBJDIR ||= Pathname.new(ENV["OBJDIR"] || "build")
+
+def all_apps
+  OOD_APPS.each_with_object ({}) { |(k, v), h| h[k] = OpenStruct.new(v) }
 end
 
-def git_fetch(path)
-  system("scl enable git19 -- git fetch", :chdir => path)
+def ruby_apps
+  all_apps.select { |k, h| h.type == "ruby" }
 end
 
-def git_checkout(version, path)
-  system("scl enable git19 -- git checkout tags/#{version}", :chdir => path)
+def node_apps
+  all_apps.select { |k, h| h.type == "nodejs" }
 end
 
-def build_node(path)
-  system("scl enable git19 nodejs010 -- npm install", :chdir => path)
+def rails_apps
+  ruby_apps.select { |k, h| h.rails }
 end
 
-def rebuild_node(path)
-  build_node(path)
-end
+#
+# Tasks
+#
 
-def build_rails(path)
-  system("scl enable rh-ruby22 -- bin/bundle install --path vendor/bundle", :chdir => path)
-  system("scl enable rh-ruby22 nodejs010 -- bin/rake assets:precompile RAILS_ENV=production", :chdir => path)
-  system("scl enable rh-ruby22 -- bin/rake tmp:clear", :chdir => path)
-end
+task :default => :build
 
-def rebuild_rails(path)
-  system("scl enable rh-ruby22 -- bin/rake tmp:clear", :chdir => path)
-  build_rails path
-  system("touch tmp/restart.txt", :chdir => path)
-end
+# Tasks for all apps
+all_apps.each do |k, h|
+  build_dir  = OBJDIR.join(h.name)
+  prefix_dir = PREFIX.join(h.name)
 
-def install_task_name(name)
-  "install_#{name}"
-end
-
-def update_task_name(name)
-  "update_#{name}"
-end
-
-def get_install_list
-  app_tasks = []
-  OOD_APPS.each do |name, data|
-    app_tasks << install_task_name(name)
+  # Create app build dir by cloning app
+  directory build_dir do
+    sh "git clone #{h.repo} #{build_dir}"
   end
-  app_tasks
-end
 
-def get_update_list
-  app_tasks = []
-  OOD_APPS.each do |name, data|
-    app_tasks << update_task_name(name)
+  # Create app prefix dir
+  directory prefix_dir
+
+  # Checkout the latest code for a given app version
+  task "#{k}_checkout" => build_dir do
+    # determine remote origin url
+    origin = `git -C #{build_dir} config --get remote.origin.url 2> /dev/null`.strip
+    # set origin if changed
+    if h.repo != origin
+      sh "git -C #{build_dir} remote set-url origin #{h.repo}"
+    end
+
+    # determine currently checked out tag
+    tag = `git -C #{build_dir} describe --tag 2> /dev/null`.strip
+    # get appropriate tag if doesn't match
+    if h.repo != origin || h.tag != tag
+      sh "git -C #{build_dir} fetch"
+      sh "git -C #{build_dir} -c advice.detachedHead=false checkout #{h.tag}"
+    end
   end
-  app_tasks
-end
 
-@app_build_tasks = get_install_list
-@app_update_tasks = get_update_list
-
-desc "Build all available applications in parallel"
-task :default => :build_apps_parallel
-
-desc "Copies all application assets to the deployment path"
-task :install => :deploy
-
-desc "Update all available applications in parallel"
-task :update => :update_apps_parallel
-
-desc "Copies the application to the deployment path"
-task :deploy do
-  puts "Making a directory at #{DEPLOY_PATH} if it doesn't exist."
-  FileUtils.mkdir_p(DEPLOY_PATH)
-  puts "Copying applications from #{File.join(Dir.pwd, SRC_DIR)} to #{DEPLOY_PATH}"
-  FileUtils.cp_r("#{SRC_DIR}/.", DEPLOY_PATH, remove_destination: true)
-end
-
-# Build a task to install each app
-OOD_APPS.each do |name, data|
-  desc %(Clone and build #{name})
-  task install_task_name(name) do
-    puts "Making a directory at #{SRC_DIR}"
-    FileUtils.mkdir_p(SRC_DIR)
-    app_path = File.join(SRC_DIR, name)
-    puts "Cloning repository #{data[:repo]}"
-    git_clone(data[:repo], app_path)
-    puts "Checking out version #{data[:repo]}/#{data[:version]}"
-    git_checkout(data[:version], app_path)
-    puts "Building assets for #{name}"
-    eval "build_#{data[:type]}('#{app_path}')"
+  # Build the app
+  namespace :build do
+    desc "Build the app: '#{h.name}'"
+    if h.type == "ruby" && h.rails
+      build_prereq = "#{k}_assets_precompile"
+    elsif h.type == "ruby"
+      build_prereq = "#{k}_bundle_install"
+    elsif h.type == "nodejs"
+      build_prereq = "#{k}_npm_install"
+    end
+    task k => build_prereq do
+      touch build_dir.join("tmp", "restart.txt")
+    end
   end
-end
 
-desc "Build all available apps in parallel"
-multitask :build_apps_parallel => @app_build_tasks
+  # Install the app
+  namespace :install do
+    desc "Install the app: '#{h.name}'"
+    task k => prefix_dir do
+      sh "rsync -rlptv --delete --quiet #{build_dir}/ #{prefix_dir}"
+    end
+  end
 
-desc "Build all available apps in serial"
-task :build_apps_serial => @app_build_tasks
-
-# Build a task to update each app
-OOD_APPS.each do |name, data|
-  desc %(Update and rebuild #{name})
-  task update_task_name(name) do
-    app_path = File.join(SRC_DIR, name)
-    puts "Fetching #{data[:repo]}"
-    git_fetch(app_path)
-    puts "Checking out version #{data[:repo]}/#{data[:version]}"
-    git_checkout(data[:version], app_path)
-    puts "Rebuilding assets for #{name}"
-    eval "rebuild_#{data[:type]}('#{app_path}')"
+  # Clean the app
+  namespace :clean do
+    desc "Clean the app: '#{h.name}'"
+    task k do
+      rm_rf build_dir
+    end
   end
 end
 
-desc "Update all available apps in parallel"
-multitask :update_apps_parallel => @app_update_tasks
+# Tasks for Ruby apps
+ruby_apps.each do |k, h|
+  build_dir = OBJDIR.join(h.name)
 
-desc "Update all available apps in serial"
-task :update_apps_serial => @app_update_tasks
+  # Bundle install gems
+  task "#{k}_bundle_install" => "#{k}_checkout" do
+    # check if bundle gems already installed
+    `#{build_dir}/bin/bundle check &> /dev/null`
+    # install them if not
+    unless $?.success?
+      sh "#{build_dir}/bin/bundle install --path=vendor/bundle"
+    end
+    sh "#{build_dir}/bin/bundle clean" # clean up unused gems
+  end
+end
+
+# Tasks for NodeJS apps
+node_apps.each do |k, h|
+  build_dir = OBJDIR.join(h.name)
+
+  # NPM install packages
+  task "#{k}_npm_install" => "#{k}_checkout" do
+    sh "npm --prefix #{build_dir} install"
+    sh "npm --prefix #{build_dir} prune &> /dev/null" # clean up unused packages
+  end
+end
+
+# Tasks for Rails apps
+rails_apps.each do |k, h|
+  build_dir = OBJDIR.join(h.name)
+
+  # Precompile assets
+  task "#{k}_assets_precompile" => "#{k}_bundle_install" do
+    sh "#{build_dir}/bin/rake -f #{build_dir}/Rakefile assets:clobber"
+    sh "#{build_dir}/bin/rake -f #{build_dir}/Rakefile assets:precompile RAILS_ENV=production RAILS_ROOT=#{build_dir} RAILS_RELATIVE_URL_ROOT=#{BASE_URI}/#{h.name}"
+    rm_rf build_dir.join("tmp", "cache")
+  end
+end
+
+# Build all the apps
+namespace :build do
+  task :all => all_apps.keys
+end
+
+# Install all the apps
+namespace :install do
+  task :all => all_apps.keys
+end
+
+# Clean all the apps
+namespace :clean do
+  task :all => all_apps.keys
+end
+
+desc "Build all apps"
+task :build => "build:all"
+
+desc "Install all apps"
+task :install => "install:all"
+
+desc "Clean all apps"
+task :clean => "clean:all"
