@@ -14,7 +14,7 @@ OOD_APPS = {
     name: "shell",
     type: "nodejs",
     repo: "https://github.com/OSC/ood-shell.git",
-    tag: "v1.2.0"
+    tag: "v1.2.1"
   },
   files: {
     name: "files",
