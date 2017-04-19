@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.1.1 (2017-04-19)
+
 Bugfixes:
 
   - updated to Shell App v1.2.1
