@@ -8,13 +8,13 @@ OOD_APPS = {
     type: "ruby",
     rails: true,
     repo: "https://github.com/OSC/ood-dashboard.git",
-    tag: "v1.10.0"
+    tag: "v1.11.0"
   },
   shell: {
     name: "shell",
     type: "nodejs",
     repo: "https://github.com/OSC/ood-shell.git",
-    tag: "v1.1.2"
+    tag: "v1.2.0"
   },
   files: {
     name: "files",
@@ -27,21 +27,21 @@ OOD_APPS = {
     type: "ruby",
     rails: true,
     repo: "https://github.com/OSC/ood-fileeditor.git",
-    tag: "v1.2.3"
+    tag: "v1.2.4"
   },
   active_jobs: {
     name: "activejobs",
     type: "ruby",
     rails: true,
     repo: "https://github.com/OSC/ood-activejobs.git",
-    tag: "v1.3.1"
+    tag: "v1.4.0"
   },
   my_jobs: {
     name: "myjobs",
     type: "ruby",
     rails: true,
     repo: "https://github.com/OSC/ood-myjobs.git",
-    tag: "v2.1.2"
+    tag: "v2.3.1"
   }
 }
 
