@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 0.1.0 (2017-04-19)
+
 Features:
 
   - updated to Dashboard App v1.11.0
