@@ -1,5 +1,9 @@
 ## Unreleased
 
+Features:
+
+  - takes advantage of `bin/setup` in each app
+
 ## 0.1.1 (2017-04-19)
 
 Bugfixes:
