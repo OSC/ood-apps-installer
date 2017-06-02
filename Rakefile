@@ -10,27 +10,27 @@ OOD_APPS = [
   {
     name: "shell",
     repo: "https://github.com/OSC/ood-shell.git",
-    tag: "v1.2.1"
+    tag: "v1.2.2"
   },
   {
     name: "files",
     repo: "https://github.com/OSC/ood-fileexplorer.git",
-    tag: "v1.3.2"
+    tag: "v1.3.3"
   },
   {
     name: "file-editor",
     repo: "https://github.com/OSC/ood-fileeditor.git",
-    tag: "v1.2.5"
+    tag: "v1.3.0"
   },
   {
     name: "activejobs",
     repo: "https://github.com/OSC/ood-activejobs.git",
-    tag: "v1.4.1"
+    tag: "v1.4.3"
   },
   {
     name: "myjobs",
     repo: "https://github.com/OSC/ood-myjobs.git",
-    tag: "v2.3.3"
+    tag: "v2.4.0"
   }
 ]
 
