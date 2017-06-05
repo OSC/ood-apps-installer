@@ -1,105 +1,79 @@
+require "json"
 require "pathname"
 
-# Blessed apps
-OOD_APPS = [
-  {
-    name: "dashboard",
-    repo: "https://github.com/OSC/ood-dashboard.git",
-    tag: "v1.11.1"
-  },
-  {
-    name: "shell",
-    repo: "https://github.com/OSC/ood-shell.git",
-    tag: "v1.2.2"
-  },
-  {
-    name: "files",
-    repo: "https://github.com/OSC/ood-fileexplorer.git",
-    tag: "v1.3.3"
-  },
-  {
-    name: "file-editor",
-    repo: "https://github.com/OSC/ood-fileeditor.git",
-    tag: "v1.3.0"
-  },
-  {
-    name: "activejobs",
-    repo: "https://github.com/OSC/ood-activejobs.git",
-    tag: "v1.4.3"
-  },
-  {
-    name: "myjobs",
-    repo: "https://github.com/OSC/ood-myjobs.git",
-    tag: "v2.4.0"
-  }
-]
-
-# System apps base-URI path
-# Example: access dashboard
-#   https://ondemand.domain.com/pun/sys/dashboard
-BASE_URI = ENV["BASE_URI"] || "/pun/sys"
-
-# Build options
-PREFIX ||= Pathname.new(ENV["PREFIX"] || "/var/www/ood/apps/sys")
-OBJDIR ||= Pathname.new(ENV["OBJDIR"] || "build")
-
-# Class that describes a list of app objects
-class Apps
-  include Enumerable
-
-  def initialize(apps = [])
-    @apps = apps.map { |app| App.new(app.to_h) }
-  end
-
-  def [](name)
-    @apps.detect { |app| app == name }
-  end
-
-  def each(&block)
-    @apps.each(&block)
-  end
+# List of all apps to deploy and install
+# @return [Array<App>] list of all apps
+def all_apps
+  json = ENV["OOD_APPS"] || File.read(ENV["OOD_CONFIG"] || File.expand_path("../config.json", __FILE__))
+  JSON.parse(json).map { |app| App.new(app.to_h) }
 end
 
-# Class that describes an app
+# Class that describes an OOD app to be built and installed
 class App
-  attr_reader :name, :repo, :tag
+  class << self
+    # System apps base-URI path
+    # @example Access dashboard
+    #   https://ondemand.domain.com/pun/sys/dashboard
+    # @return [String] base-uri path
+    def base_uri
+      ENV["BASE_URI"] || "/pun/sys"
+    end
 
+    # The root directory where all the built apps will be installed under
+    # @return [Pathname] the install root directory
+    def install_root
+      Pathname.new(ENV["PREFIX"] || "/var/www/ood/apps/sys")
+    end
+
+    # The root directory where all the apps will be built under
+    # @return [Pathname] the build root directory
+    def build_root
+      Pathname.new(ENV["OBJDIR"] || "build")
+    end
+  end
+
+  # The name of this app
+  # @return [String] app name
+  attr_reader :name
+
+  # The git repo of this app
+  # @return [String] app's git repo
+  attr_reader :repo
+
+  # The git tag to checkout for this app
+  # @return [String] app's git tag
+  attr_reader :tag
+
+  # @param opts [Hash{#to_sym => Object}] options decsribing app
+  # @option opts [String] :name The name of the app
+  # @option opts [String] :repo The git repo
+  # @option opts [String] :tag The tag of the git repo to checkout
   def initialize(opts = {})
-    # symbolize keys
-    opts = opts.each_with_object({}) { |(k, v), h| h[k.to_sym] = v }
+    # symbolize keys and drop any set to `nil`
+    opts = opts.each_with_object({}) { |(k, v), h| h[k.to_sym] = v unless v.nil?}
 
     @name = opts.fetch(:name) { raise ArgumentError, "No name specified. Missing argument: name" }.to_s
     @repo = opts.fetch(:repo) { raise ArgumentError, "No repo specified. Missing argument: repo" }.to_s
     @tag  = opts.fetch(:tag)  { raise ArgumentError, "No tag specified. Missing argument: tag" }.to_s
   end
 
+  # The root directory where this app will be built
+  # @return [Pathname] build directory
   def build_root
-    OBJDIR.join(name)
+    self.class.build_root.join(name)
   end
 
+  # The root directory where this app will be installed
+  # @return [Pathname] install directory
   def install_root
-    PREFIX.join(name)
+    self.class.install_root.join(name)
   end
 
-  def ==(other)
-    name == other.to_sym
+  # The base-URI for this app
+  # @return [String] base-uri
+  def base_uri
+    "#{self.class.base_uri}/#{name}"
   end
-
-  def to_sym
-    name
-  end
-
-  def to_h
-    {
-      name: name,
-      repo: repo,
-      tag: tag
-    }
-  end
-end
-
-def all_apps
-  Apps.new OOD_APPS
 end
 
 #
@@ -108,7 +82,7 @@ end
 
 task :default => :build
 
-# Tasks for all apps
+# Directory tasks
 all_apps.each do |app|
   # Create app install directory
   directory app.install_root
@@ -137,34 +111,40 @@ all_apps.each do |app|
       end
     end
   end
+end
 
-  # Build the app
-  namespace :build do
-    task :all => all_apps.map(&:name)
+# Building tasks
+namespace :build do
+  task :all => all_apps.map(&:name)
 
+  all_apps.each do |app|
     desc "Build the app: '#{app.name}'"
     task app.name => "checkout:#{app.name}" do
       setup_path = app.build_root.join("bin", "setup")
       if setup_path.exist? && setup_path.executable?
-        sh "PASSENGER_APP_ENV=production PASSENGER_BASE_URI=#{BASE_URI}/#{app.name} #{setup_path}"
+        sh "PASSENGER_APP_ENV=production PASSENGER_BASE_URI=#{app.base_uri} #{setup_path}"
       end
     end
   end
+end
 
-  # Install the app
-  namespace :install do
-    task :all => all_apps.map(&:name)
+# Installing tasks
+namespace :install do
+  task :all => all_apps.map(&:name)
 
+  all_apps.each do |app|
     desc "Install the app: '#{app.name}'"
     task app.name => app.install_root do
       sh "rsync -rlptv --delete --quiet #{app.build_root}/ #{app.install_root}"
     end
   end
+end
 
-  # Clean the app
-  namespace :clean do
-    task :all => all_apps.map(&:name)
+# Cleaning tasks
+namespace :clean do
+  task :all => all_apps.map(&:name)
 
+  all_apps.each do |app|
     desc "Clean the app: '#{app.name}'"
     task app.name do
       rm_rf app.build_root
