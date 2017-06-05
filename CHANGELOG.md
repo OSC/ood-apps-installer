@@ -1,5 +1,10 @@
 ## Unreleased
 
+Features:
+
+  - takes advantage of `bin/setup` in each app
+  - utilize a JSON configuration file for describing apps to deploy
+
 ## 0.1.1 (2017-04-19)
 
 Bugfixes:
