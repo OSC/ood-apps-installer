@@ -30,7 +30,7 @@ cd apps
 And then check out the latest stable release:
 
 ```sh
-scl enable git19 -- git checkout v0.1.1
+scl enable git19 -- git checkout v0.2.0
 ```
 
 ## Usage
