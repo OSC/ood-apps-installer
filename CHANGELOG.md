@@ -4,7 +4,12 @@ Features:
 
   - takes advantage of `bin/setup` in each app
   - utilize a JSON configuration file for describing apps to deploy
-  - bumped the versions of the OOD apps
+  - updated to Dashboard App v1.12.0
+  - updated to Shell App v1.2.2
+  - updated to Files App v1.3.3
+  - updated to File Editor App v1.3.1
+  - updated to Active Jobs App v1.4.4
+  - updated to My Jobs App v2.4.1
 
 ## 0.1.1 (2017-04-19)
 
