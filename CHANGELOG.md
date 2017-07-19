@@ -1,34 +1,55 @@
-## Unreleased
+# Changelog
 
-## 0.2.0 (2017-06-05)
+All notable changes to this project will be documented in this file.
 
-Features:
+The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
+and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-  - takes advantage of `bin/setup` in each app
-  - utilize a JSON configuration file for describing apps to deploy
-  - updated to Dashboard App v1.12.0
-  - updated to Shell App v1.2.2
-  - updated to Files App v1.3.3
-  - updated to File Editor App v1.3.1
-  - updated to Active Jobs App v1.4.4
-  - updated to My Jobs App v2.4.1
+## [Unreleased]
 
-## 0.1.1 (2017-04-19)
+### Changed
 
-Bugfixes:
+- Changed the `CHANGELOG.md` formatting.
 
-  - updated to Shell App v1.2.1
+## [0.2.0] - 2017-06-05
 
-## 0.1.0 (2017-04-19)
+### Added
 
-Features:
+- Utilize JSON configuration file for deploying apps.
+- Take advantage of common `bin/setup` across all apps.
 
-  - updated to Dashboard App v1.11.0
-  - updated to Shell App v1.2.0
-  - updated to File Editor App v1.2.4
-  - updated to Active Jobs App v1.4.0
-  - updated to My Jobs App v2.3.1
+### Changed
 
-## 0.0.1 (2017-04-11)
+- Updated to Dashboard App v1.12.0.
+- Updated to Shell App v1.2.2.
+- Updated to Files App v1.3.3.
+- Updated to File Editor App v1.3.1.
+- Updated to Active Jobs App v1.4.4.
+- Updated to My Jobs App v2.4.1.
 
-Initial release!
+## [0.1.1] - 2017-04-19
+
+### Changed
+
+- Updated to Shell App v1.2.1.
+
+## [0.1.0] - 2017-04-19
+
+### Changed
+
+- Updated to Dashboard App v1.11.0.
+- Updated to Shell App v1.2.0.
+- Updated to File Editor App v1.2.4.
+- Updated to Active Jobs App v1.4.0.
+- Updated to My Jobs App v2.3.1.
+
+## 0.0.1 - 2017-04-11
+
+### Added
+
+- Initial release!
+
+[Unreleased]: https://github.com/OSC/ood-apps-installer/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/OSC/ood-apps-installer/compare/v0.1.1...v0.2.0
+[0.1.1]: https://github.com/OSC/ood-apps-installer/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/OSC/ood-apps-installer/compare/v0.0.1...v0.1.0
