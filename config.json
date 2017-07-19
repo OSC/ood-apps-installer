@@ -2,17 +2,17 @@
   {
     "name": "dashboard",
     "repo": "https://github.com/OSC/ood-dashboard.git",
-    "tag": "v1.12.0"
+    "tag": "v1.15.0"
   },
   {
     "name": "shell",
     "repo": "https://github.com/OSC/ood-shell.git",
-    "tag": "v1.2.2"
+    "tag": "v1.2.3"
   },
   {
     "name": "files",
     "repo": "https://github.com/OSC/ood-fileexplorer.git",
-    "tag": "v1.3.3"
+    "tag": "v1.3.5"
   },
   {
     "name": "file-editor",
@@ -22,11 +22,11 @@
   {
     "name": "activejobs",
     "repo": "https://github.com/OSC/ood-activejobs.git",
-    "tag": "v1.4.4"
+    "tag": "v1.5.0"
   },
   {
     "name": "myjobs",
     "repo": "https://github.com/OSC/ood-myjobs.git",
-    "tag": "v2.4.1"
+    "tag": "v2.5.0"
   }
 ]
