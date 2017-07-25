@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 
 - Changed the `CHANGELOG.md` formatting.
-- Updated to Dashboard App v1.15.0.
+- Updated to Dashboard App v1.15.2.
 - Updated to Shell App v1.2.3.
 - Updated to Files App v1.3.5.
 - Updated to Active Jobs App v1.5.0.
