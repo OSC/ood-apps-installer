@@ -55,6 +55,14 @@ class App
     @name = opts.fetch(:name) { raise ArgumentError, "No name specified. Missing argument: name" }.to_s
     @repo = opts.fetch(:repo) { raise ArgumentError, "No repo specified. Missing argument: repo" }.to_s
     @tag  = opts.fetch(:tag)  { raise ArgumentError, "No tag specified. Missing argument: tag" }.to_s
+    @optional = opts.fetch(:optional, false)
+    raise ArgumentError, "Argument must be a boolean: optional" unless [true, false].include?(@optional)
+  end
+
+  # Whether app should be optionally built and/or installed
+  # @return [Boolean] whether app is optional
+  def optional?
+    @optional
   end
 
   # The root directory where this app will be built
@@ -115,7 +123,7 @@ end
 
 # Building tasks
 namespace :build do
-  task :all => all_apps.map(&:name)
+  task :all => all_apps.reject(&:optional?).map(&:name)
 
   all_apps.each do |app|
     desc "Build the app: '#{app.name}'"
@@ -130,7 +138,7 @@ end
 
 # Installing tasks
 namespace :install do
-  task :all => all_apps.map(&:name)
+  task :all => all_apps.reject(&:optional?).map(&:name)
 
   all_apps.each do |app|
     desc "Install the app: '#{app.name}'"
@@ -142,7 +150,7 @@ end
 
 # Cleaning tasks
 namespace :clean do
-  task :all => all_apps.map(&:name)
+  task :all => all_apps.reject(&:optional?).map(&:name)
 
   all_apps.each do |app|
     desc "Clean the app: '#{app.name}'"
