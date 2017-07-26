@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.0.0] - 2017-07-26
 ### Added
 - Added support for optional apps defined in configuration file.
 - Added Desktop App v0.1.1.
@@ -47,7 +49,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Initial release!
 
-[Unreleased]: https://github.com/OSC/ood-apps-installer/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/OSC/ood-apps-installer/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/OSC/ood-apps-installer/compare/v0.2.0...v1.0.0
 [0.2.0]: https://github.com/OSC/ood-apps-installer/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/OSC/ood-apps-installer/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/OSC/ood-apps-installer/compare/v0.0.1...v0.1.0
