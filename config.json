@@ -2,7 +2,7 @@
   {
     "name": "dashboard",
     "repo": "https://github.com/OSC/ood-dashboard.git",
-    "tag": "v1.15.2"
+    "tag": "v1.16.0-rc.2"
   },
   {
     "name": "shell",
