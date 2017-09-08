@@ -2,7 +2,7 @@
   {
     "name": "dashboard",
     "repo": "https://github.com/OSC/ood-dashboard.git",
-    "tag": "v1.15.2"
+    "tag": "v1.15.3"
   },
   {
     "name": "shell",
@@ -22,12 +22,12 @@
   {
     "name": "activejobs",
     "repo": "https://github.com/OSC/ood-activejobs.git",
-    "tag": "v1.5.0"
+    "tag": "v1.5.1"
   },
   {
     "name": "myjobs",
     "repo": "https://github.com/OSC/ood-myjobs.git",
-    "tag": "v2.5.0"
+    "tag": "v2.5.2"
   },
   {
     "name": "bc_desktop",
