@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Updated Job Composer App [2.6.0 => 2.6.1](https://github.com/OSC/ood-myjobs/compare/v2.6.0...v2.6.1).
 - Updated Desktops App [0.1.1 => 0.1.2](https://github.com/OSC/bc_desktop/compare/v0.1.1...v0.1.2).
 
+## [1.1.0] - 2017-09-29
+### Changed
+- Updated Dashboard App [1.15.3 => 1.17.0](https://github.com/OSC/ood-dashboard/compare/v1.15.3...v1.17.0).
+- Updated Job Composer App [2.5.2 => 2.6.0](https://github.com/OSC/ood-myjobs/compare/v2.5.2...v2.6.0).
+
 ## [1.0.1] - 2017-09-08
 ### Fixed
 - Updated Dashboard, My Jobs, Active Jobs apps to latest patch version for LSF bug fix
