@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.2.0] - 2017-11-02
 ### Changed
 - Updated Dashboard App [1.17.0 => 1.18.0](https://github.com/OSC/ood-dashboard/compare/v1.17.0...v1.18.0).
 - Updated Shell App [1.2.3 => 1.2.4](https://github.com/OSC/ood-shell/compare/v1.2.3...v1.2.4).
@@ -65,7 +67,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Initial release!
 
-[Unreleased]: https://github.com/OSC/ood-apps-installer/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/OSC/ood-apps-installer/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/OSC/ood-apps-installer/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/OSC/ood-apps-installer/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/OSC/ood-apps-installer/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/OSC/ood-apps-installer/compare/v0.2.0...v1.0.0
